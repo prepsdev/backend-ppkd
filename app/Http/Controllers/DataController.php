@@ -51,6 +51,7 @@ class DataController extends Controller
             $data = DB::table('data')
                 ->select('indikator', 'indikator_uri', 'deskripsi', 'sumber', 'lastupdate')
                 ->where('topik_uri', $topikUri)
+                ->distinct()
                 ->get();
 
             if ($data->isEmpty()) {
