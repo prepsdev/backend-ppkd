@@ -17,6 +17,7 @@ Route::post('/logout', [AuthController::class, 'logout']);
 Route::get('/tema-topik', [DataController::class, 'getTemaWithTopik']);
 Route::get('/topik/{topikUri}', [DataController::class, 'getDataByTopik']);
 Route::get('/indikator/{indikatorUri}', [DataController::class, 'getDataByIndikator']);
+Route::get('/search', [DataController::class, 'searchIndikator']);
 
 // Protected routes that require authentication
 Route::middleware('auth:sanctum')->group(function () {
