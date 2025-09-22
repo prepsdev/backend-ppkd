@@ -14,21 +14,25 @@ class DataController extends Controller
     public function getTemaWithTopik()
     {
         try {
-            // Ambil semua tema unik
-            $temaList = Data::select('tema')->distinct()->pluck('tema');
+            // Optimized: Single query to get all tema-topik combinations
+            $temaTopikData = Data::select('tema', 'topik', 'topik_uri')
+                ->distinct()
+                ->orderBy('tema')
+                ->orderBy('topik')
+                ->get();
 
-            $result = $temaList->map(function ($tema) {
-                // Ambil semua topik per tema
-                $topikList = Data::select('topik', 'topik_uri')
-                    ->where('tema', $tema)
-                    ->distinct()
-                    ->get();
-
+            // Group by tema in PHP (much faster than multiple DB queries)
+            $result = $temaTopikData->groupBy('tema')->map(function ($topikList, $tema) {
                 return [
                     'tema' => $tema,
-                    'topik_list' => $topikList
+                    'topik_list' => $topikList->map(function ($item) {
+                        return [
+                            'topik' => $item->topik,
+                            'topik_uri' => $item->topik_uri
+                        ];
+                    })->values()
                 ];
-            });
+            })->values();
 
             return response()->json([
                 'success' => true,
